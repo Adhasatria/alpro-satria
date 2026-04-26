@@ -73,7 +73,7 @@ int main(){
     cout<<"Rp 10.000      "<<indikasi4<<" Lembar"<<endl;
     cout<<"Rp 5.000       "<<indikasi5<<" Lembar"<<endl;
     cout<<"Rp 1.000       "<<indikasi6<<" Lembar"<<endl;
-    cout<<"Rp 1.000       "<<indikasi6<<" koin"<<endl;
+    cout<<"Rp 1.000       "<<"   0   "<<" koin"<<endl;
     cout<<"Rp 500         "<<indikasi7<<" Koin"<<endl;
     cout<<"Rp 200         "<<indikasi8<<" Koin"<<endl;
     cout<<"Rp 100         "<<indikasi9<<" Koin"<<endl;
