@@ -325,7 +325,7 @@ int main(){
                         cout<<"Nama Barang  : "<<daftar_barang[i]<<endl;
                         cout<<"Stok Barang  : "<<daftar_stok[i]<<endl;
                         cout<<"Harga/Stok   : Rp "<<daftar_harga[i]<<endl;
-                        cout<<"-----------------------------------------"<<endl;
+                        garis_satu();
                     }
 
                     cout<<"Pilih nomor barang yang diedit : ";
