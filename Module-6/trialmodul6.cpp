@@ -43,7 +43,7 @@ struct Branch{
 };
 struct Repository{
     string name;
-    Branch brach;
+    Branch* brach= nullptr;
     Commit commit;
     int banyak_brach;
     int idx_branch_active;
@@ -51,10 +51,9 @@ struct Repository{
 
 
 void commit(Repository* repo, string author){
-    Branch* branch_aktif = &(repo->brach);
+    Branch* branch_aktif = &(repo->brach[repo->idx_branch_active]);
     string pesan_sementara;
     char konfirmasi; 
-    Commit waktu;
 
     cout << "git commit [" << branch_aktif->nama << "]" << endl;
     cout << "--------------------------------------------" << endl;
@@ -65,10 +64,10 @@ void commit(Repository* repo, string author){
     cin >> konfirmasi;
     cin.ignore(); 
     if(konfirmasi == 'y' || konfirmasi == 'Y'){
-        waktu.time= getCurrentTimestamp();
         Commit* new_commit = new Commit;
         new_commit->message = pesan_sementara;
         new_commit->author = string();
+        new_commit->time=getCurrentTimestamp();
         new_commit->hash = generateShortHash(branch_aktif->commit_count + 1);
         
         new_commit->parent = branch_aktif->head_commit;
@@ -84,11 +83,45 @@ void commit(Repository* repo, string author){
     }
 }
 
+void log(Repository* repo, string author){
+    Branch* branch_aktif = &(repo->brach[repo->idx_branch_active]);
+    cout << "git log [" << branch_aktif->nama << "]" << endl;
+    cout << "--------------------------------------------" << endl;
+
+    if(branch_aktif->head_commit == nullptr) {
+        cout << "(No commits on this branch)" << endl;
+    } else {
+        Commit* penelusur = branch_aktif->head_commit;
+        while(penelusur != nullptr) {
+            cout << COLOR_YELLOW << "commit " << penelusur->hash << COLOR_RESET << endl;
+            cout << "Author: " << penelusur->author << endl;
+            cout << "Date  : " << penelusur->time << endl;
+            cout << "\n    " << penelusur->message << "\n" << endl;
+            penelusur = penelusur->parent;
+        }
+    }
+    cout << "--------------------------------------------" << endl;
+}
+
+void init_repository(Repository* repo, string repo_name) {
+    repo->name = repo_name;
+    repo->banyak_brach = 1;
+    repo->idx_branch_active = 0;
+
+    repo->brach = new Branch[1];
+    repo->brach[0].nama = "main";
+    repo->brach[0].head_commit = nullptr;
+    repo->brach[0].commit_count = 0;
+}
+
 
 int main(int argc, char *argv[])
 {   Repository* repo =  new Repository;
     string nama_sementara;
     string nama_author=argv[1];
+    int pilihan=-1;
+    int total_repo = 1;
+    int idx_repo_active = 0;
 
 
     cout<<COLOR_CYAN " GITSIM "<<COLOR_RESET<<"- Lightweight Git Simulator"<<endl;    
@@ -96,7 +129,7 @@ int main(int argc, char *argv[])
     cout<<"--------------------------------------------"<<endl;
     cout<<"git init"<<endl;
     cout<<"--------------------------------------------"<<endl;
-    cout<<COLOR_CYAN " Repository name :"<<COLOR_RESET;cin.ignore(); getline(cin, nama_sementara);
+    cout<<COLOR_CYAN " Repository name :"<<COLOR_RESET; getline(cin, nama_sementara);
     if(nama_sementara.empty()){
         repo->name= "my-repo";
     }else{
@@ -104,13 +137,33 @@ int main(int argc, char *argv[])
     }
     cout<<COLOR_GREEN "[OK]" COLOR_RESET<<"Initialized empty repository: "<<repo->name;
     
-    repo->brach.nama = "main";
-    repo->brach.head_commit = nullptr;
-    repo->brach.commit_count = 0;
+    
 
     cout << COLOR_GREEN "[OK] " COLOR_RESET << "Initialized empty repository: " << repo->name << endl;
     cout << "On branch: main\n" << endl;
+    system("pasue");
+
+    cout<<COLOR_CYAN " GITSIM "<<COLOR_RESET;  
+    cout<<COLOR_GRAY<<"Author :"<<COLOR_RESET<<nama_author<<" | "<<COLOR_GRAY<<"Repo : "<<COLOR_RESET<<repo->name<<" | "<<COLOR_GRAY<<"HEAD : "<<COLOR_RESET<<repo->brach.nama<<" | "<<COLOR_GRAY<<"["<<COLOR_RESET<<repo->idx_branch_active<<COLOR_GRAY<<"]"<<COLOR_RESET;
+
+    cout << "[1] git commit" << endl;
+    cout << "[2] git log" << endl;
+    cout << "[3] git branch" << endl;
+    cout << "[4] git checkout" << endl;
+    cout << "[0] exit" << endl;
+    cout << "--------------------------------------------------------" << endl;
+    cout << "Pilih menu: ";cin>>pilihan;
+    switch (pilihan)
+    {
+    case 1:
+        commit(repo, nama_author);
+        break;
+    case 2:
+        
+        break;
     
-    commit(repo, argv[1]);
+    default:
+        break;
+    }
     return 0;
 }
