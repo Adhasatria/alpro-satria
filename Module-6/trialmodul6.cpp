@@ -163,6 +163,37 @@ void buat_branch(Repository* repo, string author) {
     cout << COLOR_GREEN << "[OK] Branch '" << nama_baru << "' created from '" << branch_sekarang->nama << "'" << COLOR_RESET << endl;
 }
 
+void checkout(Repository* repo, string author) {
+    cout << "git checkout" << endl;
+    cout << "--------------------------------------------" << endl;
+    for(int i = 0; i < repo->banyak_brach; i++) {
+        if(i == repo->idx_branch_active) {
+            cout << COLOR_GREEN << "* " << repo->branches[i].nama << COLOR_RESET << endl;
+        } else {
+            cout << "  " << repo->branches[i].nama << endl;
+        }
+    }
+    cout << "--------------------------------------------" << endl;
+    cout << "Switch to branch: ";
+    string target;
+    getline(cin, target);
+
+    int target_idx = -1;
+    for(int i = 0; i < repo->banyak_brach; i++) {
+        if(repo->branches[i].nama == target) {
+            target_idx = i;
+            break;
+        }
+    }
+
+    if(target_idx == -1 || target_idx == repo->idx_branch_active) {
+        cout << COLOR_RED << "[ERROR] Invalid branch name or already active!" << COLOR_RESET << endl;
+    } else {
+        repo->idx_branch_active = target_idx;
+        cout << COLOR_GREEN << "[OK] Switched to branch '" << target << "'" << COLOR_RESET << endl;
+    }
+}
+
 
 int main(int argc, char *argv[])
 {   Repository* daftar_repo =  new Repository[1];
@@ -188,29 +219,10 @@ if(nama_sementara.empty()){
     
     cout << COLOR_GREEN "[OK] " COLOR_RESET << "Initialized empty repository: " << daftar_repo[0].name << endl;
     cout << "On branch: main\n" << endl;
-    system("pasue");
+    system("pause");
 
-    cout<<COLOR_CYAN " GITSIM "<<COLOR_RESET;  
-    cout<<COLOR_GRAY<<"Author :"<<COLOR_RESET<<nama_author<<" | "<<COLOR_GRAY<<"Repo : "<<COLOR_RESET<<daftar_repo->name<<" | "<<COLOR_GRAY<<"HEAD : "<<COLOR_RESET<<repo->branches.nama<<" | "<<COLOR_GRAY<<"["<<COLOR_RESET<<repo->idx_branch_active<<COLOR_GRAY<<"]"<<COLOR_RESET;
-
-    cout << "[1] git commit" << endl;
-    cout << "[2] git log" << endl;
-    cout << "[3] git branch" << endl;
-    cout << "[4] git checkout" << endl;
-    cout << "[0] exit" << endl;
-    cout << "--------------------------------------------------------" << endl;
-    cout << "Pilih menu: ";cin>>pilihan;
-    switch (pilihan)
-    {
-    case 1:
-        commit(repo, nama_author);
-        break;
-    case 2:
-        
-        break;
     
-    default:
-        break;
-    }
+
+
     return 0;
 }
