@@ -43,7 +43,7 @@ struct Branch{
 };
 struct Repository{
     string name;
-    Branch* brach= nullptr;
+    Branch* branches= nullptr;
     Commit commit;
     int banyak_brach;
     int idx_branch_active;
@@ -51,7 +51,7 @@ struct Repository{
 
 
 void commit(Repository* repo, string author){
-    Branch* branch_aktif = &(repo->brach[repo->idx_branch_active]);
+    Branch* branch_aktif = &(repo->branches[repo->idx_branch_active]);
     string pesan_sementara;
     char konfirmasi; 
 
@@ -84,7 +84,7 @@ void commit(Repository* repo, string author){
 }
 
 void log(Repository* repo, string author){
-    Branch* branch_aktif = &(repo->brach[repo->idx_branch_active]);
+    Branch* branch_aktif = &(repo->branches[repo->idx_branch_active]);
     cout << "git log [" << branch_aktif->nama << "]" << endl;
     cout << "--------------------------------------------" << endl;
 
@@ -108,15 +108,64 @@ void init_repository(Repository* repo, string repo_name) {
     repo->banyak_brach = 1;
     repo->idx_branch_active = 0;
 
-    repo->brach = new Branch[1];
-    repo->brach[0].nama = "main";
-    repo->brach[0].head_commit = nullptr;
-    repo->brach[0].commit_count = 0;
+    repo->branches = new Branch[1];
+    repo->branches[0].nama = "main";
+    repo->branches[0].head_commit = nullptr;
+    repo->branches[0].commit_count = 0;
+}
+
+void buat_branch(Repository* repo, string author) {
+    cout << "git branch" << endl;
+    cout << "--------------------------------------------" << endl;
+    for(int i = 0; i < repo->banyak_brach; i++) {
+        if(i == repo->idx_branch_active) {
+            cout << COLOR_GREEN << "* " << repo->branches[i].nama << " (" << repo->branches[i].commit_count << " commits)" << COLOR_RESET << endl;
+        } else {
+            cout << "  " << repo->branches[i].nama << " (" << repo->branches[i].commit_count << " commits)" << endl;
+        }
+    }
+    cout << "--------------------------------------------" << endl;
+
+    cout << "New branch name: ";
+    string nama_baru;
+    getline(cin, nama_baru);
+
+    if(nama_baru.empty()) {
+        cout << COLOR_RED << "[ERROR] Branch name cannot be empty!" << COLOR_RESET << endl;
+        return;
+    }
+
+    for(int i = 0; i < repo->banyak_brach; i++) {
+        if(repo->branches[i].nama == nama_baru) {
+            cout << COLOR_RED << "[ERROR] Branch '" << nama_baru << "' already exists!" << COLOR_RESET << endl;
+            return;
+        }
+    }
+
+    Branch* branches_baru = new Branch[repo->banyak_brach + 1];
+
+    for(int i = 0; i < repo->banyak_brach; i++) {
+        branches_baru[i].nama = repo->branches[i].nama;
+        branches_baru[i].head_commit = repo->branches[i].head_commit;
+        branches_baru[i].commit_count = repo->branches[i].commit_count;
+    }
+
+    Branch* branch_sekarang = &(repo->branches[repo->idx_branch_active]);
+    branches_baru[repo->banyak_brach].nama = nama_baru;
+    branches_baru[repo->banyak_brach].head_commit = branch_sekarang->head_commit; // Mewarisi commit asal
+    branches_baru[repo->banyak_brach].commit_count = branch_sekarang->commit_count;
+
+    delete[] repo->branches;
+
+    repo->branches = branches_baru;
+    repo->banyak_brach++;
+
+    cout << COLOR_GREEN << "[OK] Branch '" << nama_baru << "' created from '" << branch_sekarang->nama << "'" << COLOR_RESET << endl;
 }
 
 
 int main(int argc, char *argv[])
-{   Repository* repo =  new Repository;
+{   Repository* daftar_repo =  new Repository[1];
     string nama_sementara;
     string nama_author=argv[1];
     int pilihan=-1;
@@ -130,21 +179,19 @@ int main(int argc, char *argv[])
     cout<<"git init"<<endl;
     cout<<"--------------------------------------------"<<endl;
     cout<<COLOR_CYAN " Repository name :"<<COLOR_RESET; getline(cin, nama_sementara);
-    if(nama_sementara.empty()){
-        repo->name= "my-repo";
+    
+if(nama_sementara.empty()){
+        init_repository(&(daftar_repo[0]), "my-repo");
     }else{
-        repo->name= nama_sementara;
+        init_repository(&(daftar_repo[0]), nama_sementara);
     }
-    cout<<COLOR_GREEN "[OK]" COLOR_RESET<<"Initialized empty repository: "<<repo->name;
     
-    
-
-    cout << COLOR_GREEN "[OK] " COLOR_RESET << "Initialized empty repository: " << repo->name << endl;
+    cout << COLOR_GREEN "[OK] " COLOR_RESET << "Initialized empty repository: " << daftar_repo[0].name << endl;
     cout << "On branch: main\n" << endl;
     system("pasue");
 
     cout<<COLOR_CYAN " GITSIM "<<COLOR_RESET;  
-    cout<<COLOR_GRAY<<"Author :"<<COLOR_RESET<<nama_author<<" | "<<COLOR_GRAY<<"Repo : "<<COLOR_RESET<<repo->name<<" | "<<COLOR_GRAY<<"HEAD : "<<COLOR_RESET<<repo->brach.nama<<" | "<<COLOR_GRAY<<"["<<COLOR_RESET<<repo->idx_branch_active<<COLOR_GRAY<<"]"<<COLOR_RESET;
+    cout<<COLOR_GRAY<<"Author :"<<COLOR_RESET<<nama_author<<" | "<<COLOR_GRAY<<"Repo : "<<COLOR_RESET<<daftar_repo->name<<" | "<<COLOR_GRAY<<"HEAD : "<<COLOR_RESET<<repo->branches.nama<<" | "<<COLOR_GRAY<<"["<<COLOR_RESET<<repo->idx_branch_active<<COLOR_GRAY<<"]"<<COLOR_RESET;
 
     cout << "[1] git commit" << endl;
     cout << "[2] git log" << endl;
